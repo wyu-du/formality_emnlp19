@@ -7,8 +7,8 @@ from gpt.src.simple_finetune import simple_finetune, ensemble_test
 
 def run_simple_finetune_and_emsemble_decoding(domain):
     simple_finetune(domain=domain, methods='ori')
-    simple_finetune(domain=domain, methods='rule')
-    ensemble_test(domain=domain)
+#    simple_finetune(domain=domain, methods='rule')
+#    ensemble_test(domain=domain)
 
 
 def run_concat_finetune(domain):
@@ -18,9 +18,9 @@ def run_ha(domain):
     HA(domain=domain)
 
 def run_all():
-#    run_simple_finetune_and_emsemble_decoding('fr')
+    run_simple_finetune_and_emsemble_decoding('fr')
 #    run_simple_finetune_and_emsemble_decoding('em')
-    run_concat_finetune('fr')
+#    run_concat_finetune('fr')
 #    run_concat_finetune('em')
 #    run_ha('fr')
 #    run_ha('em')
