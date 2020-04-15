@@ -19,7 +19,7 @@ def run_ha(domain):
 
 def run_all():
     run_simple_finetune_and_emsemble_decoding('fr')
-#    run_simple_finetune_and_emsemble_decoding('em')
+    run_simple_finetune_and_emsemble_decoding('em')
 #    run_concat_finetune('fr')
 #    run_concat_finetune('em')
 #    run_ha('fr')
