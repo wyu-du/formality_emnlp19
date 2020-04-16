@@ -12,7 +12,7 @@ from gpt.config import *
 def train(train_corpus,dev_corpus,infer_ckpt_path,train_ckpt_path,sep_flag='\t',sep_num=1,
           learning_rate=1e-4, init_step_num=1, batch_size=64, mini_batch=16,
           eval_per_n_steps=100,total_steps=50000, early_stop_steps=20000,
-          max_to_save=2, append_eos=True,
+          max_to_save=1, append_eos=True,
           eos_symbol='\n'):
     gpt2 = GPT2(config_path)
     trainer = multi_gpu_trainer(device_id=[0], model_fn=gpt2)
