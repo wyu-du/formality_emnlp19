@@ -68,7 +68,7 @@ def ensemble_test(domain='fr',model_type=['ori','rule'],
     write_file_lines(output_path, result)
 
 
-def simple_finetune(domain='fr',methods:'ori or rule'='ori',max_len_limit=220):
+def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     methods=[methods]
     if not os.path.exists('models_'+domain):
         os.mkdir('models_'+domain)

@@ -232,7 +232,7 @@ class multi_gpu_trainer:
         assert batch_size>mini_batch*device_num and batch_size%(mini_batch*device_num)==0
         self.learning_rate=learning_rate
         sess=self.create_session_init_and_print_all_trainable_vars(max_to_save)
-        self.restore_model_and_init(sess, infer_ckpt_path, train_ckpt_path)
+        self.restore_model_and_init(sess, 'gpt/models/117M/', 'gpt/models/117M/')
         train = load_corpus(train_corpus)
         # train=[' '.join(['you' for j in range(0,512)]) for i in range(0,512)]
         dev = load_corpus(dev_corpus)
