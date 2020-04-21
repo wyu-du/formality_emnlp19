@@ -119,14 +119,14 @@ class multi_gpu_trainer:
         reader = pywrap_tensorflow.NewCheckpointReader(ckpt)
         var_to_shape_map = reader.get_variable_to_shape_map()
         for key in var_to_shape_map:
-            	try:
-            		with tf.variable_scope(key.split("/")[0], reuse=tf.AUTO_REUSE):
-            			var = tf.get_variable(key.split("/")[1])
-            			sess.run(var.assign(reader.get_tensor(key)))
+            try:
+                with tf.variable_scope(key.split("/")[0], reuse=tf.AUTO_REUSE):
+                    var = tf.get_variable(key.split("/")[1])
+                    sess.run(var.assign(reader.get_tensor(key)))
                     print ('Variable scope: '+ key.split("/")[0])
-            			print ('assign pretrain model to ' + key)
-            	except ValueError as e:
-            		print ('ignore ' + key)
+                    print ('assign pretrain model to ' + key)
+            except ValueError as e:
+                print ('ignore ' + key)
 
     def restore_model_and_init(self, sess, ckpt_for_infer, ckpt_for_train):
         with self.graph.as_default():
