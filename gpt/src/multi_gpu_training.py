@@ -97,6 +97,7 @@ class multi_gpu_trainer:
                     self.vars_for_train.append(v)
                 elif v.name.startswith('beta'):
                     self.vars_for_train.append(v)
+                    self.vars_for_infer.append(v)
                 elif v.name.startswith('parallel'):
                     pass
                 else:
