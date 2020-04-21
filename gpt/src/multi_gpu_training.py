@@ -91,7 +91,7 @@ class multi_gpu_trainer:
                 v_size = np.prod(np.array(v.shape.as_list())).tolist()
                 total_size += v_size
             tf.logging.info("Total trainable variables size: %d", total_size)
-            all_var_list = slim.get_variables_to_restore()
+            all_var_list = tf.contrib.framework.get_variables_to_restore()
             for v in all_var_list:
                 if 'Adam' in v.name:
                     self.vars_for_train.append(v)
@@ -123,8 +123,7 @@ class multi_gpu_trainer:
             			sess.run(var.assign(reader.get_tensor(key)))
             			print ('assign pretrain model to ' + key)
             	except ValueError as e:
-            		print (e)
-            		print ('ignore ' + key)
+            		pass
 
     def restore_model_and_init(self, sess, ckpt_for_infer, ckpt_for_train):
         with self.graph.as_default():
