@@ -113,7 +113,7 @@ class multi_gpu_trainer:
             return sess
 
     def restore_model_and_init(self, sess, ckpt_for_infer, ckpt_for_train):
-        with self.graph.as_default():
+        with tf.reset_default_graph():
             if ckpt_for_infer is not None:
                 ckpt = tf.train.latest_checkpoint(ckpt_for_infer)
                 if ckpt is not None:
