@@ -82,11 +82,6 @@ class multi_gpu_trainer:
     def create_session_init_and_print_all_trainable_vars(self, max_to_save):
         # Print parameters
         with self.graph.as_default():
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            sess = tf.Session(graph=self.graph, config=config)
-            init_op = tf.global_variables_initializer()
-            
             all_weights = {v.name: v for v in tf.trainable_variables()}
             total_size = 0
             for v_name in sorted(list(all_weights)):
@@ -110,23 +105,41 @@ class multi_gpu_trainer:
                 self.saver_infer = tf.train.Saver(self.vars_for_infer, max_to_keep=max_to_save)
             if len(self.vars_for_train) > 0:
                 self.saver_train = tf.train.Saver(self.vars_for_train, max_to_keep=max_to_save)
-#            
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            sess = tf.Session(graph=self.graph, config=config)
+            init_op = tf.global_variables_initializer()
 #            sess.run(init_op)
-            return sess, init_op
+            return sess
+        
+    def restore_ckpt(self, sess, ckpt):
+        from tensorflow.python import pywrap_tensorflow
+        reader = pywrap_tensorflow.NewCheckpointReader(ckpt.model_checkpoint_path)
+        var_to_shape_map = reader.get_variable_to_shape_map()
+        for key in var_to_shape_map:
+            	try:
+            		with tf.variable_scope(key.split("/")[0], reuse=tf.AUTO_REUSE):
+            			var = tf.get_variable(key.split("/")[1])
+            			sess.run(var.assign(reader.get_tensor(key)))
+            			print ('assign pretrain model to ' + key)
+            	except ValueError as e:
+            		print (e)
+            		print ('ignore ' + key)
 
     def restore_model_and_init(self, sess, ckpt_for_infer, ckpt_for_train):
         with self.graph.as_default():
             if ckpt_for_infer is not None:
                 ckpt = tf.train.latest_checkpoint(ckpt_for_infer)
                 if ckpt is not None:
-                    self.saver_infer.restore(sess, ckpt)
+#                    self.saver_infer.restore(sess, ckpt)
+                    self.restore_ckpt(sess, ckpt)
                     tf.logging.info('restored inferring params from %s',ckpt)
             if ckpt_for_train is not None:
                 ckpt = tf.train.latest_checkpoint(ckpt_for_train)
                 if ckpt is not None:
-                    self.saver_train.restore(sess, ckpt)
+#                    self.saver_train.restore(sess, ckpt)
+                    self.restore_ckpt(sess, ckpt)
                     tf.logging.info('restored training params from %s', ckpt)
-        return sess
 
 
     def save_model(self, sess, infer_ckpt_path, train_ckpt_path, step):
@@ -234,9 +247,8 @@ class multi_gpu_trainer:
         assert batch_size%device_num==0
         assert batch_size>mini_batch*device_num and batch_size%(mini_batch*device_num)==0
         self.learning_rate=learning_rate
-        sess, init_op=self.create_session_init_and_print_all_trainable_vars(max_to_save)
-        sess=self.restore_model_and_init(sess, infer_ckpt_path, train_ckpt_path)
-        sess.run(init_op)
+        sess=self.create_session_init_and_print_all_trainable_vars(max_to_save)
+        self.restore_model_and_init(sess, infer_ckpt_path, train_ckpt_path)
         train = load_corpus(train_corpus)
         # train=[' '.join(['you' for j in range(0,512)]) for i in range(0,512)]
         dev = load_corpus(dev_corpus)
