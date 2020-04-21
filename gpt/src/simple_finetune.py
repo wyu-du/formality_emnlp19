@@ -93,8 +93,10 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     train(sep_flag='\t', sep_num=len(methods),
           train_corpus=data_path + 'train.'+'_'.join(methods),
           dev_corpus=data_path + 'val.'+'_'.join(methods),
-          infer_ckpt_path=model_path+'/formality_infer',
-          train_ckpt_path=model_path+'/formality_train')
-    test(model_path+'/formality_infer', data_path + 'eval.'+'_'.join(methods),
+#          infer_ckpt_path=model_path+'/formality_infer',
+#          train_ckpt_path=model_path+'/formality_train',
+          infer_ckpt_path='gpt/models/117M',
+          train_ckpt_path='gpt/models/117M')
+    test('gpt/models/117M', data_path + 'eval.'+'_'.join(methods),
          'evaluate/gyafc_model_outputs/' + domain + '_out/formal.gpt.'+'_'.join(methods))
 
