@@ -82,6 +82,11 @@ class multi_gpu_trainer:
     def create_session_init_and_print_all_trainable_vars(self, max_to_save):
         # Print parameters
         with self.graph.as_default():
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            sess = tf.Session(graph=self.graph, config=config)
+            init_op = tf.global_variables_initializer()
+            
             all_weights = {v.name: v for v in tf.trainable_variables()}
             total_size = 0
             for v_name in sorted(list(all_weights)):
@@ -93,26 +98,21 @@ class multi_gpu_trainer:
             tf.logging.info("Total trainable variables size: %d", total_size)
             all_var_list = slim.get_variables_to_restore()
             for v in all_var_list:
-                self.vars_for_train.append(v)
-                self.vars_for_infer.append(v)
-#                if 'Adam' in v.name:
-#                    self.vars_for_train.append(v)
-#                elif v.name.startswith('beta'):
-#                    self.vars_for_train.append(v)
-#                elif v.name.startswith('parallel'):
-#                    pass
-#                else:
-#                    self.vars_for_infer.append(v)
+                if 'Adam' in v.name:
+                    self.vars_for_train.append(v)
+                elif v.name.startswith('beta'):
+                    self.vars_for_train.append(v)
+                elif v.name.startswith('parallel'):
+                    pass
+                else:
+                    self.vars_for_infer.append(v)
             if len(self.vars_for_infer) > 0:
                 self.saver_infer = tf.train.Saver(self.vars_for_infer, max_to_keep=max_to_save)
             if len(self.vars_for_train) > 0:
                 self.saver_train = tf.train.Saver(self.vars_for_train, max_to_keep=max_to_save)
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            sess = tf.Session(graph=self.graph, config=config)
-            init_op = tf.global_variables_initializer()
-            sess.run(init_op)
-            return sess
+#            
+#            sess.run(init_op)
+            return sess, init_op
 
     def restore_model_and_init(self, sess, ckpt_for_infer, ckpt_for_train):
         with self.graph.as_default():
@@ -126,6 +126,7 @@ class multi_gpu_trainer:
                 if ckpt is not None:
                     self.saver_train.restore(sess, ckpt)
                     tf.logging.info('restored training params from %s', ckpt)
+        return sess
 
 
     def save_model(self, sess, infer_ckpt_path, train_ckpt_path, step):
@@ -233,8 +234,9 @@ class multi_gpu_trainer:
         assert batch_size%device_num==0
         assert batch_size>mini_batch*device_num and batch_size%(mini_batch*device_num)==0
         self.learning_rate=learning_rate
-        sess=self.create_session_init_and_print_all_trainable_vars(max_to_save)
-        self.restore_model_and_init(sess, infer_ckpt_path, train_ckpt_path)
+        sess, init_op=self.create_session_init_and_print_all_trainable_vars(max_to_save)
+        sess=self.restore_model_and_init(sess, infer_ckpt_path, train_ckpt_path)
+        sess.run(init_op)
         train = load_corpus(train_corpus)
         # train=[' '.join(['you' for j in range(0,512)]) for i in range(0,512)]
         dev = load_corpus(dev_corpus)
