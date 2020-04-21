@@ -114,7 +114,7 @@ class multi_gpu_trainer:
         
     def restore_ckpt(self, sess, ckpt):
         from tensorflow.python import pywrap_tensorflow
-        reader = pywrap_tensorflow.NewCheckpointReader(ckpt.model_checkpoint_path)
+        reader = pywrap_tensorflow.NewCheckpointReader(ckpt)
         var_to_shape_map = reader.get_variable_to_shape_map()
         for key in var_to_shape_map:
             	try:
