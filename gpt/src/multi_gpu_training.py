@@ -123,7 +123,7 @@ class multi_gpu_trainer:
             			sess.run(var.assign(reader.get_tensor(key)))
             			print ('assign pretrain model to ' + key)
             	except ValueError as e:
-            		pass
+            		print ('ignore ' + key)
 
     def restore_model_and_init(self, sess, ckpt_for_infer, ckpt_for_train):
         with self.graph.as_default():
