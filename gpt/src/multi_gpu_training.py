@@ -120,10 +120,13 @@ class multi_gpu_trainer:
         var_to_shape_map = reader.get_variable_to_shape_map()
         for key in var_to_shape_map:
             try:
-                with tf.variable_scope(key.split("/")[0], reuse=tf.AUTO_REUSE):
-                    var = tf.get_variable(key.split("/")[1])
+                var_name = key.split("/")[-1]
+                var_scope = '/'.join(key.split("/")[:-1])
+                var_scope = var_scope.strip('/')
+                print(var_scope)
+                with tf.variable_scope(var_scope, reuse=tf.AUTO_REUSE):
+                    var = var_name
                     sess.run(var.assign(reader.get_tensor(key)))
-                    print ('Variable scope: '+ key.split("/")[0])
                     print ('assign pretrain model to ' + key)
             except ValueError as e:
                 print ('ignore ' + key)
