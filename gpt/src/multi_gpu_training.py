@@ -125,7 +125,7 @@ class multi_gpu_trainer:
                 var_scope = var_scope.strip('/')
                 print(var_scope)
                 with tf.variable_scope(var_scope, reuse=tf.AUTO_REUSE):
-                    var = var_name
+                    var = tf.get_variable(var_name)
                     sess.run(var.assign(reader.get_tensor(key)))
                     print ('assign pretrain model to ' + key)
             except ValueError as e:
