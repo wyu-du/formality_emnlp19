@@ -70,9 +70,9 @@ def ensemble_test(domain='fr',model_type=['ori','rule'],
 
 def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     methods=[methods]
-    if not os.path.exists('models_'+domain):
-        os.mkdir('models_'+domain)
-    model_path='models_'+domain+'/'+'_'.join(methods)
+    if not os.path.exists('gpt/models/'+domain):
+        os.mkdir('gpt/models/'+domain)
+    model_path='gpt/models/'+domain+'/'+'_'.join(methods)
 #    init_model_path = './models/formality_infer'
     if not os.path.exists(model_path):
         os.mkdir(model_path)
