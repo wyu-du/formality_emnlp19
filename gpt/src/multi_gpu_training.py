@@ -109,7 +109,7 @@ class multi_gpu_trainer:
             config.gpu_options.allow_growth = True
             sess = tf.Session(graph=self.graph, config=config)
             init_op = tf.global_variables_initializer()
-#            sess.run(init_op)
+            sess.run(init_op)
             return sess
         
     def restore_ckpt(self, sess, ckpt):
