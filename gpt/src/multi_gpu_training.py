@@ -93,15 +93,16 @@ class multi_gpu_trainer:
             tf.logging.info("Total trainable variables size: %d", total_size)
             all_var_list = slim.get_variables_to_restore()
             for v in all_var_list:
-                if 'Adam' in v.name:
-                    self.vars_for_train.append(v)
-                elif v.name.startswith('beta'):
-                    self.vars_for_train.append(v)
-                    self.vars_for_infer.append(v)
-                elif v.name.startswith('parallel'):
-                    pass
-                else:
-                    self.vars_for_infer.append(v)
+                self.vars_for_train.append(v)
+                self.vars_for_infer.append(v)
+#                if 'Adam' in v.name:
+#                    self.vars_for_train.append(v)
+#                elif v.name.startswith('beta'):
+#                    self.vars_for_train.append(v)
+#                elif v.name.startswith('parallel'):
+#                    pass
+#                else:
+#                    self.vars_for_infer.append(v)
             if len(self.vars_for_infer) > 0:
                 self.saver_infer = tf.train.Saver(self.vars_for_infer, max_to_keep=max_to_save)
             if len(self.vars_for_train) > 0:
