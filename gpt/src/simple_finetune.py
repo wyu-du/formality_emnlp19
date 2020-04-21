@@ -11,7 +11,7 @@ from gpt.config import *
 
 def train(train_corpus,dev_corpus,infer_ckpt_path,train_ckpt_path,sep_flag='\t',sep_num=1,
           learning_rate=1e-4, init_step_num=1, batch_size=128, mini_batch=16,
-          eval_per_n_steps=100,total_steps=30000, early_stop_steps=2000,
+          eval_per_n_steps=100,total_steps=30000, early_stop_steps=500,
           max_to_save=1, append_eos=True,
           eos_symbol='\n'):
     gpt2 = GPT2(config_path)
@@ -73,19 +73,19 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     if not os.path.exists('gpt/models/'+domain):
         os.mkdir('gpt/models/'+domain)
     model_path='gpt/models/'+domain+'/'+'_'.join(methods)
-#    init_model_path = './models/formality_infer'
+    output_path='evaluate/'+domain+'/'
     if not os.path.exists(model_path):
         os.mkdir(model_path)
-        os.mkdir(model_path+'/formality_train')
-        os.mkdir(model_path+'/formality_infer')
+        os.mkdir(model_path+'/shake_train')
+        os.mkdir(model_path+'/shake_infer')
     data_path = 'training_data/dif_models_'+domain+'/'
-    cat_files([data_path + 'informal.train.'+m for m in methods]+ [ data_path + 'formal.train.ori', ],
+    cat_files([data_path + 'modern-train.tok']+ [data_path + 'original-train.tok'],
               data_path + 'train.'+'_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    cat_files([data_path + 'informal.val.' + m for m in methods] + [data_path + 'formal.val.ori', ],
+    cat_files([data_path + 'modern-val.tok'] + [data_path + 'original-val.tok'],
               data_path + 'val.' + '_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    lp = cat_files([data_path + 'informal.test.' + m for m in methods],
+    lp = cat_files([data_path + 'modern-test.tok'],
                    data_path + 'eval.' + '_'.join(methods),
                    tokenizer=text_enc, max_len=max_len_limit)
     if lp:
@@ -93,8 +93,8 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     train(sep_flag='\t', sep_num=len(methods),
           train_corpus=data_path + 'train.'+'_'.join(methods),
           dev_corpus=data_path + 'val.'+'_'.join(methods),
-          infer_ckpt_path=model_path+'/formality_infer',
-          train_ckpt_path=model_path+'/formality_train')
-    test(model_path+'/formality_infer', data_path + 'eval.'+'_'.join(methods),
-         'evaluate/gyafc_model_outputs/' + domain + '_out/formal.gpt.'+'_'.join(methods))
+          infer_ckpt_path=model_path+'/shake_infer',
+          train_ckpt_path=model_path+'/shake_train')
+    test(model_path+'/shake_infer', data_path + 'eval.'+'_'.join(methods),
+         output_path + 'shake.gpt.'+'_'.join(methods))
 
