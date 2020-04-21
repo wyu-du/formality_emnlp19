@@ -149,7 +149,7 @@ def positions_for(tokens, past_length):
 class Encoder():
     def __init__(self,scope,hparam):
         if scope is None:
-            self.scope='encoder'
+            self.scope='model'
         else:
             self.scope=scope
         self.hparams=hparam
@@ -183,7 +183,7 @@ class Encoder():
 
 class Decoder():
     def __init__(self,scope,hparams):
-        self.scope = scope
+        self.scope = 'model'
         self.hparams = hparams
         with tf.variable_scope(scope):
             with tf.variable_scope('model', reuse=tf.AUTO_REUSE):
@@ -247,7 +247,7 @@ class Decoder():
         self.enc_h_all=merge_first_two_dims(tile_to_beam_size(self.enc_h_all,beam_size=beam_size))
 
 
-    def decode_one_step(self,hparams:"no use, only for consistency of api", input_token, past_dec:list):
+    def decode_one_step(self,hparams, input_token, past_dec:list):
         with tf.variable_scope(self.scope, reuse=tf.AUTO_REUSE):
             with tf.variable_scope('model', reuse=tf.AUTO_REUSE):
                 all_past_length = [0 if past_dec[j] is None else tf.shape(past_dec[j])[-2] for j in range(0,len(past_dec))]
