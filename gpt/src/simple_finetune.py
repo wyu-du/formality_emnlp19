@@ -11,7 +11,7 @@ from gpt.config import *
 
 def train(train_corpus,dev_corpus,infer_ckpt_path,train_ckpt_path,sep_flag='\t',sep_num=1,
           learning_rate=1e-4, init_step_num=1, batch_size=128, mini_batch=16,
-          eval_per_n_steps=50,total_steps=30000, early_stop_steps=200,
+          eval_per_n_steps=100,total_steps=30000, early_stop_steps=500,
           max_to_save=1, append_eos=True,
           eos_symbol='\n'):
     gpt2 = GPT2(config_path)
@@ -76,16 +76,16 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     output_path='evaluate/'+domain+'/'
     if not os.path.exists(model_path):
         os.mkdir(model_path)
-        os.mkdir(model_path+'/modern_train')
-        os.mkdir(model_path+'/modern_infer')
+        os.mkdir(model_path+'/fluent_train')
+        os.mkdir(model_path+'/fluent_infer')
     data_path = 'training_data/dif_models_'+domain+'/'
-    cat_files([data_path + 'original-train.tok']+ [data_path + 'modern-train.tok'],
+    cat_files([data_path + 'disf.train.tok']+ [data_path + 'flt.train.tok'],
               data_path + 'train.'+'_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    cat_files([data_path + 'original-val.tok'] + [data_path + 'modern-val.tok'],
+    cat_files([data_path + 'disf.dev.tok'] + [data_path + 'flt.dev.tok'],
               data_path + 'val.' + '_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    lp = cat_files([data_path + 'original-test.tok'],
+    lp = cat_files([data_path + 'disf.test.tok'],
                    data_path + 'eval.' + '_'.join(methods),
                    tokenizer=text_enc, max_len=max_len_limit)
     if lp:
@@ -93,8 +93,8 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     train(sep_flag='\t', sep_num=len(methods),
           train_corpus=data_path + 'train.'+'_'.join(methods),
           dev_corpus=data_path + 'val.'+'_'.join(methods),
-          infer_ckpt_path=model_path+'/modern_infer',
-          train_ckpt_path=model_path+'/modern_train')
-    test(model_path+'/modern_infer', data_path + 'eval.'+'_'.join(methods),
-         output_path + 'modern.gpt.'+'_'.join(methods))
+          infer_ckpt_path=model_path+'/fluent_infer',
+          train_ckpt_path=model_path+'/fluent_train')
+    test(model_path+'/fluent_infer', data_path + 'eval.'+'_'.join(methods),
+         output_path + 'flu.gpt.'+'_'.join(methods))
 
