@@ -107,13 +107,13 @@ def simple_finetune_debug(domain='fr',methods='ori',max_len_limit=220):
     output_path='evaluate/'+domain+'/'
     if not os.path.exists(model_path):
         os.mkdir(model_path)
-        os.mkdir(model_path+'/modern_train')
-        os.mkdir(model_path+'/modern_infer')
+        os.mkdir(model_path+'/neutral_train')
+        os.mkdir(model_path+'/neutral_infer')
     data_path = 'training_data/dif_models_'+domain+'/'
-    lp = cat_files([data_path + 'original-train.tok'],
-                   data_path + 'train_debug.' + '_'.join(methods),
+    lp = cat_files([data_path + 'biased-test.tok'],
+                   data_path + 'test_debug.' + '_'.join(methods),
                    tokenizer=text_enc, max_len=max_len_limit)
     if lp:
         print('_'.join(methods)+' data droped')
-    test(model_path+'/modern_infer', data_path + 'train_debug.'+'_'.join(methods),
-         output_path + 'train.modern.gpt.'+'_'.join(methods))
+    test(model_path+'/neutral_infer', data_path + 'test_debug.'+'_'.join(methods),
+         output_path + 'test.neutral.gpt.'+'_'.join(methods))
