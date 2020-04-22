@@ -1,7 +1,7 @@
 import os
 from gpt.src.concat_fine_tuning import concat_finetuning, domain_combined
 from gpt.src.hierarchical_attention import HA
-from gpt.src.simple_finetune import simple_finetune, ensemble_test
+from gpt.src.simple_finetune import simple_finetune, ensemble_test, simple_finetune_debug
 
 
 def run_simple_finetune_and_emsemble_decoding(domain):
@@ -17,7 +17,8 @@ def run_ha(domain):
     HA(domain=domain)
 
 def run_all():
-    simple_finetune(domain='flu', methods='ori')
+#    simple_finetune(domain='flu', methods='ori')
+    simple_finetune_debug(domain='flu', methods='ori')
 #    simple_finetune(domain='fr', methods='ori')
 #    run_simple_finetune_and_emsemble_decoding('fr')
 #    run_simple_finetune_and_emsemble_decoding('em')

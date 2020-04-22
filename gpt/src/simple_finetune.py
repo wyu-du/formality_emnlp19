@@ -98,3 +98,28 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     test(model_path+'/fluent_infer', data_path + 'eval.'+'_'.join(methods),
          output_path + 'flu.gpt.'+'_'.join(methods))
 
+
+def simple_finetune_debug(domain='fr',methods='ori',max_len_limit=220):
+    methods=[methods]
+    if not os.path.exists('gpt/models/'+domain):
+        os.mkdir('gpt/models/'+domain)
+    model_path='gpt/models/'+domain+'/'+'_'.join(methods)
+    output_path='evaluate/'+domain+'/'
+    if not os.path.exists(model_path):
+        os.mkdir(model_path)
+        os.mkdir(model_path+'/fluent_train')
+        os.mkdir(model_path+'/fluent_infer')
+    data_path = 'training_data/dif_models_'+domain+'/'
+    cat_files([data_path + 'disf.train.tok']+ [data_path + 'flt.train.tok'],
+              data_path + 'train.'+'_'.join(methods),
+              tokenizer=text_enc, max_len=max_len_limit)
+    cat_files([data_path + 'disf.dev.tok'] + [data_path + 'flt.dev.tok'],
+              data_path + 'val.' + '_'.join(methods),
+              tokenizer=text_enc, max_len=max_len_limit)
+    lp = cat_files([data_path + 'disf.test.tok'],
+                   data_path + 'eval.' + '_'.join(methods),
+                   tokenizer=text_enc, max_len=max_len_limit)
+    if lp:
+        print('_'.join(methods)+' data droped')
+    test(model_path+'/fluent_infer', data_path + 'train.'+'_'.join(methods),
+         output_path + 'flu.gpt.'+'_'.join(methods))
