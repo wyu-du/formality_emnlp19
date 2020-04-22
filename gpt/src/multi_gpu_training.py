@@ -51,32 +51,32 @@ class multi_gpu_trainer:
             self.accum_grad_ops={}
             for i in range(0, len(self.device_id)):
                 with tf.variable_scope(tf.get_variable_scope(), reuse=(i != 0)):
-                    with tf.device('/gpu:%d' % self.device_id[i]):
-                        with tf.name_scope('parallel_%d' % i) as scope:
-                            self.input[i] = tf.placeholder(tf.int32, [None, None], name='input_%d' % i)
-                            self.input_len[i] = tf.placeholder(tf.int32, [None, ], name='input_len_%d' % i)
-                            self.target[i] = tf.placeholder(tf.int32, [None, None], name='target_%d' % i)
-                            if self.only_predict_target:
-                                self.target_mask[i] = tf.placeholder(tf.float32, [None, None], name='mask_%d' % i)
-                            else:
-                                self.target_mask[i] = None
-                            loss = self.model_fn.build_training_graph(self.input[i], self.input_len[i], self.target[i], self.target_mask[i])
-                            self.losses.append(loss)
-                            grads = self.opt.compute_gradients(loss)
-                            tvs = tf.trainable_variables()
-                            self.accum_vars[i] = [tf.Variable(tf.zeros_like(tv.initialized_value()), trainable=False)
-                                                  for tv in
-                                                  tvs]
-                            self.zero_ops[i] = [tv.assign(tf.zeros_like(tv)) for tv in self.accum_vars[i]]
-                            self.accum_grad_ops[i] = [self.accum_vars[i][j].assign_add(gv[0]) for j, gv in
-                                                      enumerate(grads)]
-                            self.tower_grads.append([(self.accum_vars[i][j], gv[1]) for j, gv in enumerate(grads)])
+#                    with tf.device('/gpu:%d' % self.device_id[i]):
+#                        with tf.name_scope('parallel_%d' % i) as scope:
+                    self.input[i] = tf.placeholder(tf.int32, [None, None], name='input_%d' % i)
+                    self.input_len[i] = tf.placeholder(tf.int32, [None, ], name='input_len_%d' % i)
+                    self.target[i] = tf.placeholder(tf.int32, [None, None], name='target_%d' % i)
+                    if self.only_predict_target:
+                        self.target_mask[i] = tf.placeholder(tf.float32, [None, None], name='mask_%d' % i)
+                    else:
+                        self.target_mask[i] = None
+                    loss = self.model_fn.build_training_graph(self.input[i], self.input_len[i], self.target[i], self.target_mask[i])
+                    self.losses.append(loss)
+                    grads = self.opt.compute_gradients(loss)
+                    tvs = tf.trainable_variables()
+                    self.accum_vars[i] = [tf.Variable(tf.zeros_like(tv.initialized_value()), trainable=False)
+                                          for tv in
+                                          tvs]
+                    self.zero_ops[i] = [tv.assign(tf.zeros_like(tv)) for tv in self.accum_vars[i]]
+                    self.accum_grad_ops[i] = [self.accum_vars[i][j].assign_add(gv[0]) for j, gv in
+                                              enumerate(grads)]
+                    self.tower_grads.append([(self.accum_vars[i][j], gv[1]) for j, gv in enumerate(grads)])
             grads = self.average_gradients(self.tower_grads)
-            with tf.device('/gpu:0'):
-                self.accum_steps=tf.placeholder(tf.float32, [], name='accum_stpes')
-                self.train_step = self.opt.apply_gradients([(g/self.accum_steps, v) for g,v in grads])
-                self.avg_loss=tf.stack(self.losses,axis=0)
-                self.avg_loss=tf.reduce_mean(self.avg_loss)
+#            with tf.device('/gpu:0'):
+            self.accum_steps=tf.placeholder(tf.float32, [], name='accum_stpes')
+            self.train_step = self.opt.apply_gradients([(g/self.accum_steps, v) for g,v in grads])
+            self.avg_loss=tf.stack(self.losses,axis=0)
+            self.avg_loss=tf.reduce_mean(self.avg_loss)
 
 
     def create_session_init_and_print_all_trainable_vars(self, max_to_save):
