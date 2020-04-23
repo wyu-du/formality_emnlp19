@@ -76,16 +76,16 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     output_path='evaluate/'+domain+'/'
     if not os.path.exists(model_path):
         os.mkdir(model_path)
-        os.mkdir(model_path+'/shake_train')
-        os.mkdir(model_path+'/shake_infer')
+        os.mkdir(model_path+'/neutral_train')
+        os.mkdir(model_path+'/neutral_infer')
     data_path = 'training_data/dif_models_'+domain+'/'
-    cat_files([data_path + 'modern-train.tok']+ [data_path + 'original-train.tok'],
+    cat_files([data_path + 'biased-train.tok']+ [data_path + 'neutral-train.tok'],
               data_path + 'train.'+'_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    cat_files([data_path + 'modern-val.tok'] + [data_path + 'original-val.tok'],
+    cat_files([data_path + 'biased-val.tok'] + [data_path + 'neutral-val.tok'],
               data_path + 'val.' + '_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    lp = cat_files([data_path + 'modern-test.tok'],
+    lp = cat_files([data_path + 'biased-test.tok'],
                    data_path + 'eval.' + '_'.join(methods),
                    tokenizer=text_enc, max_len=max_len_limit)
     if lp:
@@ -93,10 +93,10 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
     train(sep_flag='\t', sep_num=len(methods),
           train_corpus=data_path + 'train.'+'_'.join(methods),
           dev_corpus=data_path + 'val.'+'_'.join(methods),
-          infer_ckpt_path=model_path+'/shake_infer',
-          train_ckpt_path=model_path+'/shake_train')
-    test(model_path+'/shake_infer', data_path + 'eval.'+'_'.join(methods),
-         output_path + 'shake.gpt.'+'_'.join(methods))
+          infer_ckpt_path=model_path+'/neutral_infer',
+          train_ckpt_path=model_path+'/neutral_train')
+    test(model_path+'/neutral_infer', data_path + 'eval.'+'_'.join(methods),
+         output_path + 'neutral.gpt.'+'_'.join(methods))
 
 
 def simple_finetune_debug(domain='fr',methods='ori',max_len_limit=220):
