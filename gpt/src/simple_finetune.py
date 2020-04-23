@@ -42,7 +42,9 @@ def test(model_dir,input_path,output_path,beam_size=4,max_dec_len=60,dec_alpha=0
     lines=read_file_lines(input_path)
     result=[]
     for line in lines:
-        result.append(generator.generate(sess,line))
+        text = generator.generate(sess,line)
+        if len(text) == 0: text = 'null'
+        result.append(text)
     sess.close()
     write_file_lines(output_path, result)
 
