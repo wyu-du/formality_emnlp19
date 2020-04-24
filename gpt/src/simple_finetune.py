@@ -10,7 +10,7 @@ from gpt.config import *
 
 
 def train(train_corpus,dev_corpus,infer_ckpt_path,train_ckpt_path,sep_flag='\t',sep_num=1,
-          learning_rate=1e-5, init_step_num=1, batch_size=128, mini_batch=16,
+          learning_rate=1e-3, init_step_num=1, batch_size=128, mini_batch=16,
           eval_per_n_steps=10,total_steps=30000, early_stop_steps=50,
           max_to_save=1, append_eos=True,
           eos_symbol='\n'):
