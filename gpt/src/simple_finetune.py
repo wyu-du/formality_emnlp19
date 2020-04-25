@@ -70,7 +70,7 @@ def ensemble_test(domain='fr',model_type=['ori','rule'],
     write_file_lines(output_path, result)
 
 
-def simple_finetune(domain='fr',methods='ori',max_len_limit=400):
+def simple_finetune(domain='fr',methods='ori',max_len_limit=200):
     methods=[methods]
     if not os.path.exists('gpt/models/'+domain):
         os.mkdir('gpt/models/'+domain)

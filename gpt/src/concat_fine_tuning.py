@@ -463,13 +463,13 @@ def train(config_path,input_num,ori_gpt_model=None,sep_flag='\t',
 def concat_finetuning(domain='fr',max_len_limit=220,only_test=False):
     methods = ['ori', 'rule']
     model_path='gpt/models_cat_'+domain+'/'+'_'.join(methods)
-    init_model_path = 'gpt/models/formality_infer'
+#    init_model_path = 'gpt/models/formality_infer'
     if not os.path.exists('gpt/models_cat_'+domain):
         os.mkdir('gpt/models_cat_'+domain)
     if not os.path.exists(model_path):
         os.mkdir(model_path)
         os.mkdir(model_path+'/formality_train')
-        shutil.copytree(init_model_path, model_path+'/formality_infer')
+        os.mkdir(model_path+'/formality_infer')
     data_path = 'training_data/dif_models_'+domain+'/'
     cat_files([data_path + 'informal.train.'+m for m in methods]+ [ data_path + 'formal.train.rule', ],
               data_path + 'train.'+'_'.join(methods),
