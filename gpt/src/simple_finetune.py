@@ -33,7 +33,7 @@ def train(train_corpus,dev_corpus,infer_ckpt_path,train_ckpt_path,sep_flag='\t',
                      eos_id=gpt2.text_enc.encode(eos_symbol)[0])
 
 
-def test(model_dir,input_path,output_path,beam_size=4,max_dec_len=60,dec_alpha=0.6):
+def test(model_dir,input_path,output_path,beam_size=4,max_dec_len=200,dec_alpha=0.6):
     gpt2 = GPT2(config_path)
     generator = beam_search_generator(gpt2, beam_size=beam_size,
                                       model_directory=model_dir, max_dec_len=max_dec_len,
@@ -70,7 +70,7 @@ def ensemble_test(domain='fr',model_type=['ori','rule'],
     write_file_lines(output_path, result)
 
 
-def simple_finetune(domain='fr',methods='ori',max_len_limit=220):
+def simple_finetune(domain='fr',methods='ori',max_len_limit=400):
     methods=[methods]
     if not os.path.exists('gpt/models/'+domain):
         os.mkdir('gpt/models/'+domain)
