@@ -17,7 +17,7 @@ def run_ha(domain):
     HA(domain=domain)
 
 def run_all():
-    simple_finetune(domain='biased', methods='ori')
+    simple_finetune(domain='shake', methods='ori_flu')
 #    simple_finetune_debug(domain='biased', methods='ori')
 #    simple_finetune(domain='fr', methods='ori')
 #    run_simple_finetune_and_emsemble_decoding('fr')
