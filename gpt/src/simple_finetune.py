@@ -10,8 +10,8 @@ from gpt.config import *
 
 
 def train(train_corpus,dev_corpus,infer_ckpt_path,train_ckpt_path,sep_flag='\t',sep_num=1,
-          learning_rate=1e-5, init_step_num=1, batch_size=128, mini_batch=16,
-          eval_per_n_steps=10,total_steps=30000, early_stop_steps=50,
+          learning_rate=1e-5, init_step_num=1, batch_size=225, mini_batch=15,
+          eval_per_n_steps=10,total_steps=50000, early_stop_steps=100,
           max_to_save=1, append_eos=True,
           eos_symbol='\n'):
     gpt2 = GPT2(config_path)
@@ -70,7 +70,7 @@ def ensemble_test(domain='fr',model_type=['ori','rule'],
     write_file_lines(output_path, result)
 
 
-def simple_finetune(domain='fr',methods='ori',max_len_limit=200):
+def simple_finetune(domain='all',methods='ori',max_len_limit=200):
     methods=[methods]
     if not os.path.exists('gpt/models/'+domain):
         os.mkdir('gpt/models/'+domain)
@@ -78,44 +78,42 @@ def simple_finetune(domain='fr',methods='ori',max_len_limit=200):
     output_path='evaluate/'+domain+'/'
     if not os.path.exists(model_path):
         os.mkdir(model_path)
-        os.mkdir(model_path+'/neutral_train')
-        os.mkdir(model_path+'/neutral_infer')
+        os.mkdir(model_path+'/all_train')
+        os.mkdir(model_path+'/all_infer')
     data_path = 'training_data/dif_models_'+domain+'/'
-    cat_files([data_path + 'biased-train.tok']+ [data_path + 'neutral-train.tok'],
+    cat_files([data_path + 'biased.train.tok']+ [data_path + 'neutral.train.tok'],
               data_path + 'train.'+'_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    cat_files([data_path + 'biased-val.tok'] + [data_path + 'neutral-val.tok'],
+    cat_files([data_path + 'biased.val.tok'] + [data_path + 'neutral.val.tok'],
               data_path + 'val.' + '_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    lp = cat_files([data_path + 'biased-test.tok'],
-                   data_path + 'eval.' + '_'.join(methods),
-                   tokenizer=text_enc, max_len=max_len_limit)
-    if lp:
-        print('_'.join(methods)+' data droped')
+#    lp = cat_files([data_path + 'biased-test.tok'],
+#                   data_path + 'eval.' + '_'.join(methods),
+#                   tokenizer=text_enc, max_len=max_len_limit)
+#    if lp:
+#        print('_'.join(methods)+' data droped')
     train(sep_flag='\t', sep_num=len(methods),
           train_corpus=data_path + 'train.'+'_'.join(methods),
           dev_corpus=data_path + 'val.'+'_'.join(methods),
-          infer_ckpt_path=model_path+'/neutral_infer',
-          train_ckpt_path=model_path+'/neutral_train')
-    test(model_path+'/neutral_infer', data_path + 'eval.'+'_'.join(methods),
-         output_path + 'neutral.gpt.'+'_'.join(methods))
+          infer_ckpt_path=model_path+'/all_infer',
+          train_ckpt_path=model_path+'/all_train')
+#    test(model_path+'/neutral_infer', data_path + 'eval.'+'_'.join(methods),
+#         output_path + 'neutral.gpt.'+'_'.join(methods))
 
 
-def simple_finetune_debug(domain='fr',methods='ori',max_len_limit=220):
+def simple_finetune_output(in_domain='all', out_domain='em', 
+                           methods='ori', in_file='informal.test.tok', 
+                           out_file='formal.gpt.downsample.', max_len_limit=300):
     methods=[methods]
-    if not os.path.exists('gpt/models/'+domain):
-        os.mkdir('gpt/models/'+domain)
-    model_path='gpt/models/'+domain+'/'+'_'.join(methods)
-    output_path='evaluate/'+domain+'/'
-    if not os.path.exists(model_path):
-        os.mkdir(model_path)
-        os.mkdir(model_path+'/neutral_train')
-        os.mkdir(model_path+'/neutral_infer')
-    data_path = 'training_data/dif_models_'+domain+'/'
-    lp = cat_files([data_path + 'biased-test.tok'],
-                   data_path + 'test_debug.' + '_'.join(methods),
+    model_path='gpt/models/'+in_domain+'/'+'_'.join(methods)
+    if not os.path.exists('evaluate/'+out_domain+'/'+'_'.join(methods)):
+        os.mkdir('evaluate/'+out_domain+'/'+'_'.join(methods))
+    output_path='evaluate/'+out_domain+'/'+'/'+'_'.join(methods)+'/'
+    data_path = 'training_data/dif_models_'+out_domain+'/'
+    lp = cat_files([data_path + in_file],
+                   data_path + 'test.' + '_'.join(methods),
                    tokenizer=text_enc, max_len=max_len_limit)
     if lp:
         print('_'.join(methods)+' data droped')
-    test(model_path+'/neutral_infer', data_path + 'test_debug.'+'_'.join(methods),
-         output_path + 'test.neutral.gpt.'+'_'.join(methods))
+    test(model_path+'/all_infer', data_path + 'test.'+'_'.join(methods),
+         output_path + out_file +'_'.join(methods))
