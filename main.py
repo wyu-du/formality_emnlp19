@@ -17,10 +17,11 @@ def run_ha(domain):
     HA(domain=domain)
 
 def run_all():
-    simple_finetune(domain='biased_new', methods='ori')
-    simple_finetune_output(in_domain='biased_new', out_domain='biased_new', 
-                           methods='ori', in_file='biased.test.tok', 
-                           out_file='neutral.gpt.new.', max_len_limit=300)
+    simple_finetune(domain='flickr', methods='ori',
+                    source='romantic',target='funny')
+    simple_finetune_output(in_domain='flickr', out_domain='flickr', 
+                           methods='ori', in_file='romantic.test.tok', 
+                           out_file='funny.gpt.', max_len_limit=300)
 #    simple_finetune_debug(domain='biased', methods='ori')
 #    simple_finetune(domain='fr', methods='ori')
 #    run_simple_finetune_and_emsemble_decoding('fr')

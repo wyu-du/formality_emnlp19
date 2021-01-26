@@ -70,7 +70,9 @@ def ensemble_test(domain='fr',model_type=['ori','rule'],
     write_file_lines(output_path, result)
 
 
-def simple_finetune(domain='all',methods='ori',max_len_limit=200):
+def simple_finetune(domain='all',methods='ori',
+                    source='biased',target='neutral',
+                    max_len_limit=200):
     methods=[methods]
     if not os.path.exists('gpt/models/'+domain):
         os.mkdir('gpt/models/'+domain)
@@ -81,10 +83,10 @@ def simple_finetune(domain='all',methods='ori',max_len_limit=200):
         os.mkdir(model_path+'/all_train')
         os.mkdir(model_path+'/all_infer')
     data_path = 'training_data/dif_models_'+domain+'/'
-    cat_files([data_path + 'biased.train.tok']+ [data_path + 'neutral.train.tok'],
+    cat_files([data_path + source + '.train.tok']+ [data_path + target + '.train.tok'],
               data_path + 'train.'+'_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
-    cat_files([data_path + 'biased.val.tok'] + [data_path + 'neutral.val.tok'],
+    cat_files([data_path + source + '.val.tok'] + [data_path + target + '.val.tok'],
               data_path + 'val.' + '_'.join(methods),
               tokenizer=text_enc, max_len=max_len_limit)
 #    lp = cat_files([data_path + 'biased-test.tok'],
